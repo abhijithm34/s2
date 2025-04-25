@@ -1,0 +1,248 @@
+Here's a complete Student Management System using React, including features for adding students, listing them, and enrolling them in courses.
+
+🗂️ Project Structure
+pgsql
+Copy
+Edit
+student-management-react/
+│
+├── public/
+│   └── index.html
+│
+├── src/
+│   ├── components/
+│   │   ├── Header.js
+│   │   ├── StudentForm.js
+│   │   ├── StudentList.js
+│   │   └── EnrollmentForm.js
+│   │
+│   ├── pages/
+│   │   ├── Home.js
+│   │   └── Enroll.js
+│   │
+│   ├── context/
+│   │   └── StudentContext.js
+│   │
+│   ├── App.js
+│   ├── index.js
+│   └── styles.css
+│
+├── package.json
+└── README.md
+1️⃣ StudentContext.js – Context API
+js
+Copy
+Edit
+// src/context/StudentContext.js
+import { createContext, useState } from "react";
+
+export const StudentContext = createContext();
+
+export const StudentProvider = ({ children }) => {
+  const [students, setStudents] = useState([]);
+  const [enrollments, setEnrollments] = useState([]);
+
+  const addStudent = (student) => {
+    setStudents(prev => [...prev, student]);
+  };
+
+  const enrollStudent = (studentId, course) => {
+    setEnrollments(prev => [...prev, { studentId, course }]);
+  };
+
+  return (
+    <StudentContext.Provider value={{ students, addStudent, enrollments, enrollStudent }}>
+      {children}
+    </StudentContext.Provider>
+  );
+};
+2️⃣ Header.js
+js
+Copy
+Edit
+// src/components/Header.js
+import { Link } from "react-router-dom";
+
+const Header = () => (
+  <header>
+    <h1>Student Management</h1>
+    <nav>
+      <Link to="/">Home</Link>
+      <Link to="/enroll">Enroll</Link>
+    </nav>
+  </header>
+);
+
+export default Header;
+3️⃣ StudentForm.js
+js
+Copy
+Edit
+// src/components/StudentForm.js
+import { useState, useContext } from "react";
+import { StudentContext } from "../context/StudentContext";
+
+const StudentForm = () => {
+  const { addStudent } = useContext(StudentContext);
+  const [student, setStudent] = useState({ id: "", name: "", age: "" });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    addStudent(student);
+    setStudent({ id: "", name: "", age: "" });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input value={student.id} onChange={e => setStudent({ ...student, id: e.target.value })} placeholder="ID" required />
+      <input value={student.name} onChange={e => setStudent({ ...student, name: e.target.value })} placeholder="Name" required />
+      <input type="number" value={student.age} onChange={e => setStudent({ ...student, age: e.target.value })} placeholder="Age" required />
+      <button type="submit">Add Student</button>
+    </form>
+  );
+};
+
+export default StudentForm;
+4️⃣ StudentList.js
+js
+Copy
+Edit
+// src/components/StudentList.js
+import { useContext } from "react";
+import { StudentContext } from "../context/StudentContext";
+
+const StudentList = () => {
+  const { students } = useContext(StudentContext);
+
+  return (
+    <div>
+      <h2>Student List</h2>
+      {students.length === 0 ? <p>No students added.</p> : (
+        <ul>
+          {students.map(stu => (
+            <li key={stu.id}>{stu.id} - {stu.name} ({stu.age} yrs)</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
+export default StudentList;
+5️⃣ EnrollmentForm.js
+js
+Copy
+Edit
+// src/components/EnrollmentForm.js
+import { useState, useContext } from "react";
+import { StudentContext } from "../context/StudentContext";
+
+const EnrollmentForm = () => {
+  const { students, enrollStudent } = useContext(StudentContext);
+  const [studentId, setStudentId] = useState("");
+  const [course, setCourse] = useState("");
+
+  const handleEnroll = (e) => {
+    e.preventDefault();
+    enrollStudent(studentId, course);
+    setStudentId("");
+    setCourse("");
+  };
+
+  return (
+    <form onSubmit={handleEnroll}>
+      <select value={studentId} onChange={(e) => setStudentId(e.target.value)} required>
+        <option value="">Select Student</option>
+        {students.map(stu => (
+          <option key={stu.id} value={stu.id}>{stu.name}</option>
+        ))}
+      </select>
+      <input value={course} onChange={(e) => setCourse(e.target.value)} placeholder="Course" required />
+      <button type="submit">Enroll</button>
+    </form>
+  );
+};
+
+export default EnrollmentForm;
+6️⃣ Pages: Home.js and Enroll.js
+js
+Copy
+Edit
+// src/pages/Home.js
+import StudentForm from "../components/StudentForm";
+import StudentList from "../components/StudentList";
+
+const Home = () => (
+  <>
+    <StudentForm />
+    <StudentList />
+  </>
+);
+
+export default Home;
+
+// src/pages/Enroll.js
+import EnrollmentForm from "../components/EnrollmentForm";
+
+const Enroll = () => (
+  <>
+    <h2>Enroll a Student</h2>
+    <EnrollmentForm />
+  </>
+);
+
+export default Enroll;
+7️⃣ App.js
+js
+Copy
+Edit
+// src/App.js
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Header from "./components/Header";
+import Home from "./pages/Home";
+import Enroll from "./pages/Enroll";
+import { StudentProvider } from "./context/StudentContext";
+import "./styles.css";
+
+function App() {
+  return (
+    <StudentProvider>
+      <Router>
+        <Header />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/enroll" element={<Enroll />} />
+        </Routes>
+      </Router>
+    </StudentProvider>
+  );
+}
+
+export default App;
+8️⃣ index.js
+js
+Copy
+Edit
+// src/index.js
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+
+ReactDOM.render(<App />, document.getElementById("root"));
+9️⃣ styles.css
+css
+Copy
+Edit
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+form {
+  margin-bottom: 20px;
+}
+
+input, select {
+  margin: 5px;
+  padding: 5px;
+}
