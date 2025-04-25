@@ -1,0 +1,146 @@
+Here’s a complete beginner-friendly React Calculator app with a clean UI, built using functional components and hooks (useState). It includes:
+
+A display for the current input/result
+
+Number buttons (0–9), operations (+, –, ×, ÷)
+
+Clear and Equals buttons
+
+Evaluation of expressions using eval() for simplicity
+
+✅ File Structure
+pgsql
+Copy
+Edit
+calculator-app/
+├── public/
+│   └── index.html
+├── src/
+│   ├── App.js
+│   ├── Calculator.css
+│   └── index.js
+├── package.json
+🔹 App.js
+jsx
+Copy
+Edit
+import React, { useState } from 'react';
+import './Calculator.css';
+
+function App() {
+  const [input, setInput] = useState('');
+
+  const handleClick = (value) => {
+    setInput((prev) => prev + value);
+  };
+
+  const handleClear = () => {
+    setInput('');
+  };
+
+  const handleEqual = () => {
+    try {
+      // Evaluate the input safely
+      const result = eval(input); // ⚠️ Use math.js in real apps for safety
+      setInput(result.toString());
+    } catch (error) {
+      setInput('Error');
+    }
+  };
+
+  return (
+    <div className="calculator">
+      <h2>React Calculator</h2>
+      <input type="text" value={input} readOnly />
+      <div className="buttons">
+        <button onClick={handleClear}>C</button>
+        <button onClick={() => handleClick('/')}>/</button>
+        <button onClick={() => handleClick('*')}>*</button>
+        <button onClick={() => handleClick('-')}>-</button>
+
+        <button onClick={() => handleClick('7')}>7</button>
+        <button onClick={() => handleClick('8')}>8</button>
+        <button onClick={() => handleClick('9')}>9</button>
+        <button onClick={() => handleClick('+')}>+</button>
+
+        <button onClick={() => handleClick('4')}>4</button>
+        <button onClick={() => handleClick('5')}>5</button>
+        <button onClick={() => handleClick('6')}>6</button>
+        <button className="equal" onClick={handleEqual}>=</button>
+
+        <button onClick={() => handleClick('1')}>1</button>
+        <button onClick={() => handleClick('2')}>2</button>
+        <button onClick={() => handleClick('3')}>3</button>
+
+        <button onClick={() => handleClick('0')}>0</button>
+        <button onClick={() => handleClick('.')}>.</button>
+      </div>
+    </div>
+  );
+}
+
+export default App;
+🔹 Calculator.css
+css
+Copy
+Edit
+.calculator {
+  max-width: 300px;
+  margin: 40px auto;
+  padding: 20px;
+  border-radius: 15px;
+  background: #f0f0f0;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+.calculator input {
+  width: 100%;
+  height: 40px;
+  font-size: 24px;
+  margin-bottom: 10px;
+  padding: 5px;
+  text-align: right;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+button {
+  font-size: 20px;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #e0e0e0;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #d4d4d4;
+}
+
+.equal {
+  grid-column: span 2;
+  background: #4caf50;
+  color: white;
+}
+🔹 index.js
+jsx
+Copy
+Edit
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+📝 Notes
+This uses eval() for simplicity — avoid using eval() in production apps. Instead, use libraries like math.js for safe expression evaluation.
+
+You can enhance this calculator by adding keyboard support, parentheses, and history tracking.
+
+Want help adding advanced features or converting to TypeScript or class-based components?
